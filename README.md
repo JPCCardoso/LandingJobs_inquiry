@@ -8,7 +8,7 @@ Items available:
 
 2 - Project Code & Presentation (Jupyter Notebook with source code, explanations, and results obtained)
 
-3 - Project Presentation (Presentation, in PDF, with the main questions that guided the project and what results where obtained)
+3 - Project Presentation (PDF presentation with the main questions that guided the project and what results where obtained)
 
 ---------------------------------------------------------------------
 
