@@ -1,0 +1,139 @@
+# libraries imported to work with
+import missingno as msno
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from scipy.stats import f_oneway
+
+
+# 1. import the original dataset provided by Landing Jobs
+# Due to UnicodeDecodeError: 'utf-8', added ENCODING to resolve it)
+results_df = pd.read_csv('landing_jobs_data_csv.csv', encoding = 'latin-1')
+
+# 2. Drop column not worth having
+# Residence_Country (all are located in Portugal)
+results_df.drop('Residence_Country', axis = 1, inplace = True)
+
+# 3. Inictial analysis
+# search for possible gaps
+msno.matrix(results_df)
+plt.show()
+plt.clf()
+
+#print(results_df.head()) # show the first 5 rows
+#print(results_df.columns.values.tolist()) # retreive all columns names
+total_answers = results_df.ID.count() # 3371
+
+
+# Graph 1
+# Boxplot per Gender
+plt.figure(figsize  = (5, 5))
+g1 = plt.subplot()
+sns.boxplot(data = results_df, x = 'Gender', y = 'Age')
+g1.set_title('Age Distribution by Gender')
+#plt.savefig('boxplot.png', dpi = 100)
+plt.show()
+plt.clf()
+
+# Statistical Analysis
+# Create new DF to drop NA present in AGE column
+clean_age_df = results_df.dropna(subset = ['Age'])
+# separate data
+male_age = clean_age_df.Age[clean_age_df.Gender == 'Male']
+female_age = clean_age_df.Age[clean_age_df.Gender == 'Female']
+prefer_not_say_age = clean_age_df.Age[clean_age_df.Gender == 'I prefer not to say']
+# perform ANOVA test
+fstat, pval = f_oneway(male_age, female_age, prefer_not_say_age)
+#print(pval) # since p-value > 0.05, we don't reject H0. Mean is equal between pops
+
+
+# Graph 2 & 3
+# Bar Graph for Remote Work opinion by Industry and Job Role
+# Create 1 DataFrame for Remote Work Opinion vs Industry
+remote_work_industry_df = results_df[['Employer_Industry', 'Remote_Work_Opinion']]
+remote_work_industry_df.dropna()
+remote_work_job_df = results_df[['Job_Role', 'Remote_Work_Opinion']]
+remote_work_job_df.dropna()
+
+plt.figure(figsize = (15, 8))
+# Graph for Job Role vs Remote Work Opinion
+g21 = plt.subplot(1, 2, 1)
+sns.barplot(data = remote_work_job_df, x = 'Job_Role', y = 'Remote_Work_Opinion')
+plt.title('Remote Work Opinion by Job Role (A)')
+plt.ylim([3.75 , 6.55])
+plt.grid(axis = 'y')
+# remove original xticks labels and create a custom to explain in text
+g21.set_xticklabels([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18])
+plt.ylabel('')
+plt.xlabel('Job Role')
+
+# Graph for Industry vs Remote Work Opinion
+g22 = plt.subplot(1, 2, 2)
+sns.barplot(data = remote_work_industry_df, x = 'Employer_Industry', y = 'Remote_Work_Opinion')
+plt.title('Remote Work Opinion by Employer Industry (B)')
+plt.grid(axis = 'y')
+plt.ylim([3.75 , 6.55])
+# remove original xticks labels and create a custom to explain in text
+g22.set_xticklabels([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24])
+plt.xlabel('Employer Industry')
+plt.ylabel('Remote Work Opinion')
+# clear top and right side of graph
+sns.despine()
+
+#plt.savefig('remote_test.png', dpi = 100, bbox_inches = 'tight')
+plt.show()
+plt.clf()
+
+
+# Graph 3
+# Heatmaps with Job vs Languages and Job vs Framework
+# retrieve all column names
+all_columns_names = results_df.columns.values.tolist()
+# retrieve data needed (Languange + Job role) to create DataFrame
+job_languages = []
+job_languages.append('Job_Role')
+for name in all_columns_names:
+    if 'Language' in name:
+        job_languages.append(name)
+col_names = []
+for name in job_languages:
+    temp1 = name.split('_')
+    col_names.append(temp1[1])
+job_languages_df = results_df[job_languages]
+job_languages_df.columns = col_names
+# Set the DataFrame to be indexed by the Role Column, with count by Language
+job_languages_df = job_languages_df.groupby('Role').count().reset_index()
+job_languages_df = job_languages_df.set_index(['Role'])
+
+# Heatmap for Languages by Job Role
+plt.figure (figsize = (22, 10))
+sns.heatmap(job_languages_df, annot = True, fmt = 'd', linewidths = 0.1, cmap="YlGnBu")
+plt.title('Most Common Languages by Job Role')
+
+#plt.savefig('heat12.png', dpi = 100, orientation = 'landscape', bbox_inches = 'tight')
+plt.show()
+plt.clf()
+
+# retrieve data needed (Frameworj + Job role) to create DataFrame
+job_framework = []
+job_framework.append('Job_Role')
+for name in all_columns_names:
+    if 'Framework' in name:
+        job_framework.append(name)
+col_names2 = []
+for name in job_framework:
+    temp2 = name.split('_')
+    col_names2.append(temp2[1])
+job_framework_df = results_df[job_framework]
+job_framework_df.columns = col_names2
+# Set the DataFrame to be indexed by the Role Column, with count by Framework
+job_framework_df = job_framework_df.groupby('Role').count().reset_index()
+job_framework_df = job_framework_df.set_index(['Role'])
+
+plt.figure (figsize = (22, 10))
+sns.heatmap(job_framework_df, annot = True, fmt = 'd', linewidths = 0.1, cmap="YlGnBu")
+plt.title('Most Common Frameworks by Job Role')
+
+#plt.savefig('heat2.png', dpi = 100, orientation = 'landscape', bbox_inches = 'tight')
+plt.show()
+plt.clf()
