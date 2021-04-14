@@ -14,8 +14,8 @@ Items available:
 
 Main Questions:
 
-A) 
+A) What is the age distribution between genders?
 
-B) 
+B) Does the type of Industry the people work with affect their opinion regarding remote work?
 
-C)
+C) What are the most common languages by each job role? And what Framework?
