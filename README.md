@@ -7,3 +7,15 @@ Items available:
 1 - Project Code (Python file with the source code for the project)
 
 2 - Project Code & Presentation (Jupyter Notebook with source code, explanations, and results obtained)
+
+3 - Project Presentation (Presentation, in PDF, with the main questions that guided the project and what results where obtained)
+
+---------------------------------------------------------------------
+
+Main Questions:
+
+A) 
+
+B) 
+
+C)
